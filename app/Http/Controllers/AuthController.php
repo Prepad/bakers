@@ -33,7 +33,8 @@ class AuthController extends Controller
         $user->role_id = 1;
         $user->save();
         $token = Auth::login($user);
-        return $this->respondWithToken($token);
+        $refreshToken = $user->createRefreshToken();
+        return $this->respondWithToken($token, $refreshToken);
     }
 
     /**
@@ -60,15 +61,29 @@ class AuthController extends Controller
     }
 
     /**
-     * @param $token
+     * @param string $token
+     * @param string $refreshToken
      * @return JsonResponse
      */
-    protected function respondWithToken($token): JsonResponse
+    protected function respondWithToken(string $token, string $refreshToken): JsonResponse
     {
         return response()->json([
             'access_token' => $token,
+            'refresh_token' => $refreshToken,
             'token_type' => 'bearer',
-            'expires_in' => config('jwt.ttl') * 60,
+            'expires_in' => now()->addMinutes(config('jwt.ttl')),
         ]);
+    }
+
+    public function refresh(string $refreshToken)
+    {
+        /** @var User $user */
+        $user = User::whereRefreshToken($refreshToken)->first();
+
+        if (!$user?->verifyRefreshToken($refreshToken)) {
+            throw new \Exception('Invalid refresh token');
+        }
+
+        return $this->tokenResponse(Auth::login($user), $user->createRefreshToken());
     }
 }
