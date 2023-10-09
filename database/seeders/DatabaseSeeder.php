@@ -18,5 +18,11 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        (new RoleSeeder())->run();
+        (new AbstractBakingTypeSeeder())->run();
+        (new UserSeeder())->run();
+        (new BakingTypeSeeder())->run();
+        (new BakeSeeder())->run();
+        (new OrderSeeder())->run();
     }
 }

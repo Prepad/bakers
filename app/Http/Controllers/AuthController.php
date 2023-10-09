@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use \Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -29,8 +30,10 @@ class AuthController extends Controller
         $user = new User();
         $user->email = $request->email;
         $user->name = $request->name;
-        $user->password = Hash::make($request->password);
+        $user->password = '12345678';
         $user->role_id = 1;
+        $user->email_verified_at = now();
+        $user->remember_token = Str::random(10);
         $user->save();
         $token = Auth::login($user);
         $refreshToken = $user->createRefreshToken();

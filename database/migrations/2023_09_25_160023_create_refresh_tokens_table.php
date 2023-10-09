@@ -28,7 +28,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('refresh_tokens', function (Blueprint $table) {
-            $table->dropForeign('user_id');
+            $table->dropForeign(['user_id']);
         });
         Schema::dropIfExists('refresh_tokens');
     }
